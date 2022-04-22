@@ -9,11 +9,11 @@
 #include "BLEDevice.h"
 
 static char *BLE_address("df:5c:55:00:00:00"); // lowercase only or else will fail to match
+// if your pairing pin starts with 0, eg "024024", set the powerpal_pass_key as 24024
 static uint32_t powerpal_pass_key = 123123;
 static float pulses_per_kw = 1000;
 static uint8_t read_every = 1; // minutes (only tested between 1 - 15 minutes)
 
-// assuming reading of 1 minute
 static float pulse_multiplier = (60.0 / read_every) / pulses_per_kw; //0.075
 
 static BLEUUID SERVICE_POWERPAL_UUID("59DAABCD-12F4-25A6-7D4F-55961DCE4205");
