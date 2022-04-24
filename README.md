@@ -3,6 +3,45 @@ _This repository is not affiliated with Powerpal._
 # powerpal_ble
 Collection of code, tools and documentation for data retrieval over BLE from your Powerpal
 
+## Using the ESPHome Component
+
+The ESPHome component hasn't been merged into esphome yet, but you can use it via `external_components`
+
+#### Requirements:
+- An ESP32
+- A configured Powerpal
+- Powerpal device information:
+  - BLE MAC address (can be found on device sticker, by ESPHome BLEtracker, or by using an app like nRF Connect)
+  - Connection pairing pin (6 digits you input when setting up your device, also can be found printed in Powerpal info pack, or inside the Powerpal application)
+  - Your Smart meter pulse rate (eg. 1000 pulses = 1kW/h)
+
+```yaml
+external_components:
+  - source: github://WeekendWarrior1/esphome@powerpal_ble
+    # requires ble_client because I had to add some small features to authenticate properly
+    components: [ ble_client, powerpal_ble ]
+
+esp32_ble_tracker:
+
+ble_client:
+  - mac_address: DF:5C:55:00:00:00
+    id: powerpal
+
+sensor:
+  - platform: powerpal_ble
+    ble_client_id: powerpal
+    power:
+      name: "Powerpal Power"
+    energy:
+      name: "Powerpal Total Energy"
+    battery_level:
+      name: "Powerpal Battery"
+    pairing_code: 123123
+    notification_interval: 1 # get updates every 1 minute
+    pulses_per_kWh: 1000
+```
+You can also find a full config here: [powerpal_ble.yaml](powerpal_ble.yaml) 
+
 ## Using the Arduino sketch
 This sketch simply prints the timestamp, pulses and energy usage of the updates sent by the Powerpal (the update interval can also be configured).
 
