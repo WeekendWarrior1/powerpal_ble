@@ -71,6 +71,7 @@ SERVICE_POWERPAL_UUID: '59DAABCD-12F4-25A6-7D4F-55961DCE4205'
 #### Connecting to a Powerpal over BLE
 
 The Powerpal has simple authentication requirements allowing most devices and libraries to connect and pair without issue:
+
 ![Powerpal sent authreq](assets/powerpal_authreq.png)
 
 After connecting, to be able to read, write or subscribe to notifications of any of the Powerpal Service characteristics your pairingCode must be written to the `pairingCode` characteristic, `59DA0011-12F4-25A6-7D4F-55961DCE4205`.

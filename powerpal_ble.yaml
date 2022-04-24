@@ -1,0 +1,44 @@
+esphome:
+  name: powerpalble
+
+esp32:
+  board: wemos_d1_mini32
+  framework:
+    type: arduino
+
+external_components:
+  - source: github://WeekendWarrior1/esphome@powerpal_ble
+    # requires ble_client because I had to add some small features to authenticate properly
+    components: [ ble_client, powerpal_ble ]
+
+api:
+
+ota:
+
+wifi:
+  ssid: "YOUR_WIFI"
+  password: "super_secret"
+
+  ap:
+    ssid: "powerpalble Fallback Hotspot"
+    password: "super_secret"
+
+esp32_ble_tracker:
+
+ble_client:
+  - mac_address: DF:5C:55:01:02:03
+    id: powerpal
+
+sensor:
+  - platform: powerpal_ble
+    ble_client_id: powerpal
+    power:
+      name: "Powerpal Power"
+    energy:
+      name: "Powerpal Total Energy"
+    battery_level:
+      name: "Powerpal Battery"
+    pairing_code: 123123
+    notification_interval: 1
+    pulses_per_kWh: 1000
+
