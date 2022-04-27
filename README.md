@@ -3,6 +3,8 @@ _This repository is not affiliated with Powerpal._
 # powerpal_ble
 Collection of code, tools and documentation for data retrieval over BLE from your Powerpal
 
+![Powerpal Device](assets/powerpal_device_cropped.png)
+
 ## Using the ESPHome Component
 
 The ESPHome component hasn't been merged into esphome yet, but you can use it via `external_components`
@@ -40,7 +42,8 @@ sensor:
     notification_interval: 1 # get updates every 1 minute
     pulses_per_kWh: 1000
 ```
-You can also find a full config here: [powerpal_ble.yaml](powerpal_ble.yaml) 
+You can also find a full config here: [powerpal_ble.yaml](powerpal_ble.yaml)
+And the component code here: [powerpal_ble ESPHome Component](https://github.com/WeekendWarrior1/esphome/tree/powerpal_ble/esphome/components/powerpal_ble)
 
 ## Using the Arduino sketch
 This sketch simply prints the timestamp, pulses and energy usage of the updates sent by the Powerpal (the update interval can also be configured).
@@ -154,5 +157,4 @@ unix_time += (pData[3] << 24);
 // next 2 bytes (4+5) are the pulses within the time interval window, with reversed byte order
 uint16_t total_pulses = pData[4];
 total_pulses += pData[5] << 8;
-
 ```
