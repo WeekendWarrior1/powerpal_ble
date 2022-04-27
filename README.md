@@ -5,6 +5,10 @@ Collection of code, tools and documentation for data retrieval over BLE from you
 
 ![Powerpal Device](assets/powerpal_device_cropped.png)
 
+- [Using the ESPHome Component](#using-the-esphome-component)
+- [Using the Arduino sketch](#using-the-arduino-sketch)
+- [BLE Documentation](#ble-documentation)
+
 ## Using the ESPHome Component
 
 The ESPHome component hasn't been merged into esphome yet, but you can use it via `external_components`
@@ -43,6 +47,7 @@ sensor:
     pulses_per_kWh: 1000
 ```
 You can also find a full config here: [powerpal_ble.yaml](powerpal_ble.yaml)
+
 And the component code here: [powerpal_ble ESPHome Component](https://github.com/WeekendWarrior1/esphome/tree/powerpal_ble/esphome/components/powerpal_ble)
 
 ## Using the Arduino sketch
@@ -71,7 +76,7 @@ static uint8_t read_every = 1; // minutes (only tested between 1 - 15 minutes)
 #### Serial Monitor output:
 ![Serial Monitor Example Output](assets/arduino_serial_monitor_output.png)
 
-## Connecting to a Powerpal over BLE
+## BLE Documentation
 
 #### Important BLE services
 ```js
