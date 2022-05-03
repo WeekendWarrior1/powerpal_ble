@@ -44,7 +44,7 @@ sensor:
       name: "Powerpal Battery"
     pairing_code: 123123
     notification_interval: 1 # get updates every 1 minute
-    pulses_per_kWh: 1000
+    pulses_per_kwh: 1000
 ```
 You can also find a full config here: [powerpal_ble.yaml](powerpal_ble.yaml)
 
