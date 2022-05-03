@@ -40,5 +40,5 @@ sensor:
       name: "Powerpal Battery"
     pairing_code: 123123
     notification_interval: 1
-    pulses_per_kWh: 1000
+    pulses_per_kwh: 1000
 
