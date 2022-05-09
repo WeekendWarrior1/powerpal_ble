@@ -5,8 +5,6 @@ import requests
 
 from bleak import BleakClient, BleakScanner, BleakError
 
-logger = logging.getLogger(__name__)
-
 pairingCodeChar = '59DA0011-12F4-25A6-7D4F-55961DCE4205'
 powerpalUUIDChar ='59DA0009-12F4-25A6-7D4F-55961DCE4205'
 powerpalSerialChar = '59DA0010-12F4-25A6-7D4F-55961DCE4205'
