@@ -14,16 +14,16 @@ def convert_pairing_code(original_pairing_code):
 
 async def main(address, my_pairing_code):
     while address is None:
-        address = input("Your Powerpal MAC address:")
-        if (address.count(':') is not 5) or (len(address) is not 17):
+        address = input("Your Powerpal MAC address: ")
+        if (address.count(':') != 5) or (len(address) != 17):
             address = None
             print("Incorrect MAC address formatting, should look like -> 12:34:56:78:9A:BC")
     while my_pairing_code is None:
-        my_pairing_code = int(input("Your Powerpal pairing code:"))
+        my_pairing_code = int(input("Your Powerpal pairing code: "))
         if not (0 <= my_pairing_code <= 999999):
             my_pairing_code = None
             print("Pairing Code should be 6 digits...")
-    input("Please confirm that you are NOT connected to the Powerpal via Bluetooth using any devices, and hit enter to continue...")
+    input("Please confirm that you are NOT connected to the Powerpal via Bluetooth using any devices, and that bluetooth is enabled on your computer, and hit enter to continue...")
 
     async with BleakClient(address) as client:
         print(f"Connected: {client.is_connected}")
