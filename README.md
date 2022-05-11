@@ -27,6 +27,10 @@ external_components:
     # requires ble_client because I had to add some small features to authenticate properly
     components: [ ble_client, powerpal_ble ]
 
+# required even if you're not using the powerpal_cloud_uploader
+http_request:
+#  id: powerpal_cloud_uploader
+
 esp32_ble_tracker:
 
 ble_client:
@@ -45,6 +49,10 @@ sensor:
     pairing_code: 123123
     notification_interval: 1 # get updates every 1 minute
     pulses_per_kwh: 1000
+#    http_request_id: powerpal_cloud_uploader
+#    cost_per_kwh: 0.20 #dollars per kWh
+#    powerpal_device_id: 0000abcd #optional, component will retrieve from your Powerpal if not set
+#    powerpal_apikey: 4a89e298-b17b-43e7-a0c1-fcd1412e98ef #optional, component will retrieve from your Powerpal if not set
 ```
 You can also find a full config here: [powerpal_ble.yaml](powerpal_ble.yaml)
 
@@ -100,10 +108,10 @@ SERVICE_POWERPAL_UUID: '59DAABCD-12F4-25A6-7D4F-55961DCE4205'
         // Used to configure the sensitivity of the pulse reading sensor (Can also be done within the app)
         ledSensitivity: '59DA0008-12F4-25A6-7D4F-55961DCE4205' // indicate, notify, read, write
 
-        // Read or change Powerpal hardware UUID
+        // Read or change Powerpal API key - this stores the Authorization key required to communicate with Powerpal's cloud REST APIs
         uuid: '59DA0009-12F4-25A6-7D4F-55961DCE4205' // indicate, notify, read, write
 
-        // Read or change Powerpal Serial Number
+        // Read or change Powerpal Serial Number (this is also the device ID used in Powerpal's cloud REST APIs)
         serialNumber: '59DA0010-12F4-25A6-7D4F-55961DCE4205' // indicate, notify, read, write
 
         // needs to be written to with your powerpal pairing key before other services are accessible

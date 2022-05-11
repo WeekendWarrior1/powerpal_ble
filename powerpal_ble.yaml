@@ -23,6 +23,10 @@ wifi:
     ssid: "powerpalble Fallback Hotspot"
     password: "super_secret"
 
+# required even if you're not using the powerpal_cloud_uploader
+http_request:
+#  id: powerpal_cloud_uploader
+
 esp32_ble_tracker:
 
 ble_client:
@@ -41,4 +45,7 @@ sensor:
     pairing_code: 123123
     notification_interval: 1
     pulses_per_kwh: 1000
-
+#    http_request_id: powerpal_cloud_uploader
+#    cost_per_kwh: 0.1872 #dollars per kWh
+#    powerpal_device_id: 0000abcd #optional, component will retrieve from your Powerpal if not set
+#    powerpal_apikey: 4a89e298-b17b-43e7-a0c1-fcd1412e98ef #optional, component will retrieve from your Powerpal if not set

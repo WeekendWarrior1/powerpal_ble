@@ -49,12 +49,12 @@ async def main(address, my_pairing_code):
         formatted_apikey = f"{joined_apikey[:8]}-{joined_apikey[8:12]}-{joined_apikey[12:16]}-{joined_apikey[16:20]}-{joined_apikey[20:]}".lower()
         print(f"Retrieved apikey: {formatted_apikey}\n")
 
-        test_endpoint = input(f"Would you like this script to validate your apikey by using it to make a request for your device information from https://readings.powerpal.net/api/v1/device/{formatted_serial}? (y/n)")
+        test_endpoint = input(f"Would you like this script to validate your apikey by using it to make a request for your device information from https://readings.powerpal.net/api/v1/device/{formatted_serial}? (y/n): ")
         if test_endpoint.lower().startswith('y'):
             url = f"https://readings.powerpal.net/api/v1/device/{formatted_serial}"
             headers = { 'Authorization': formatted_apikey }
 
-            response = requests.request("GET", url, headers=headers, data=payload)
+            response = requests.request("GET", url, headers=headers)
             if (response.status_code < 300):
                 print("Success! Looks like your Device Serial and apikey were succesfully retrieved! Here is the device information returned from https://readings.powerpal.net/api/ :")
                 print(response.text)
