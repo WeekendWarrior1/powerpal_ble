@@ -20,6 +20,8 @@ static BLEUUID SERVICE_POWERPAL_UUID("59DAABCD-12F4-25A6-7D4F-55961DCE4205");
 static BLEUUID CHAR_PAIRINGCODE_UUID("59DA0011-12F4-25A6-7D4F-55961DCE4205");  // indicate, notify, read, write
 static BLEUUID CHAR_READINGBATCHSIZE_UUID("59DA0013-12F4-25A6-7D4F-55961DCE4205");  // indicate, notify, read, write
 static BLEUUID CHAR_MEASUREMENT_UUID("59DA0001-12F4-25A6-7D4F-55961DCE4205");  // notify, read, write
+static BLEUUID CHAR_UUID_UUID("59DA0009-12F4-25A6-7D4F-55961DCE4205");  // notify, read, write
+static BLEUUID CHAR_SERIAL_NUMBER_UUID("59DA0010-12F4-25A6-7D4F-55961DCE4205");  // notify, read, write
 
 static BLEUUID SERVICE_BATTERY_UUID("0000180f-0000-1000-8000-00805f9b34fb");
 static BLEUUID CHAR_BATTERY_READ_UUID("00002a19-0000-1000-8000-00805f9b34fb");  // read, notify
@@ -38,6 +40,8 @@ static BLERemoteCharacteristic *pRemoteCharacteristic_pairingcode;
 static BLERemoteCharacteristic *pRemoteCharacteristic_readingbatchsize;
 static BLERemoteCharacteristic *pRemoteCharacteristic_measurement;
 static BLERemoteCharacteristic *pRemoteCharacteristic_battery_read;
+static BLERemoteCharacteristic *pRemoteCharacteristic_uuid;
+static BLERemoteCharacteristic *pRemoteCharacteristic_serial_number;
 
 /*
     time: '59DA0004-12F4-25A6-7D4F-55961DCE4205',
@@ -313,6 +317,24 @@ bool connectToServer()
         pClient->disconnect();
         return false;
     }
+    //uuid (cloud api key)
+    pRemoteCharacteristic_uuid = pRemoteService_battery->getCharacteristic(CHAR_UUID_UUID);
+    if (pRemoteCharacteristic_uuid == nullptr)
+    {
+        Serial.print("Failed to find our uuid UUID: ");
+        Serial.println(CHAR_UUID_UUID.toString().c_str());
+        pClient->disconnect();
+        return false;
+    }
+    //serial number (cloud device id)
+    pRemoteCharacteristic_serial_number = pRemoteService_battery->getCharacteristic(CHAR_SERIAL_NUMBER_UUID);
+    if (pRemoteCharacteristic_serial_number == nullptr)
+    {
+        Serial.print("Failed to find our serial number UUID: ");
+        Serial.println(CHAR_SERIAL_NUMBER_UUID.toString().c_str());
+        pClient->disconnect();
+        return false;
+    }
 
     connected = true;
     return true;
@@ -414,6 +436,37 @@ void loop()
                 pRemoteCharacteristic_readingbatchsize->writeValue(newBatchReadingSize, sizeof(newBatchReadingSize), false);
             }
             batchset = true;
+
+            const char* hexmap[] = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f"};
+
+            uint8_t* raw_api_key = pRemoteCharacteristic_uuid->readRawData();
+            uint8_t length = 16;
+            std::string api_key;
+            for (int i = 0; i < length; i++) {
+            if ( i == 4 || i == 6 || i == 8 || i == 10 ) {
+                api_key.append("-");
+            }
+                api_key.append(hexmap[(raw_api_key[i] & 0xF0) >> 4]);
+                api_key.append(hexmap[raw_api_key[i] & 0x0F]);
+            }
+            Serial.print("Powerpal Cloud API Key: ");
+            Serial.println(api_key.c_str());
+
+            uint8_t* raw_device_id = pRemoteCharacteristic_uuid->readRawData();
+            length = 4;
+            std::string device_id;
+            for (int i = length-1; i >= 0; i--) {
+                device_id.append(hexmap[(raw_device_id[i] & 0xF0) >> 4]);
+                device_id.append(hexmap[raw_device_id[i] & 0x0F]);
+            }
+            Serial.print("Powerpal Device ID: ");
+            Serial.println(device_id.c_str());
+
+            Serial.println("You can confirm these decoded results on a computer with curl installed by running: ");
+            Serial.print("curl -H \"Authorization: ");
+            Serial.print(api_key.c_str());
+            Serial.print("\" https://readings.powerpal.net/api/v1/device/");
+            Serial.println(device_id.c_str());
         }
     }
     else if (doScan)

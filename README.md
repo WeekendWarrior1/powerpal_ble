@@ -1,17 +1,23 @@
 _This repository is not affiliated with Powerpal._
 
 # powerpal_ble
-Collection of code, tools and documentation for data retrieval over BLE from your Powerpal
+Collection of code, tools and documentation for data retrieval over BLE from your Powerpal.
+[*Home Assistant Community Discussion*](https://community.home-assistant.io/t/powerpal-smart-energy-monitor/263713/126)
 
 ![Powerpal Device](assets/powerpal_device_cropped.png)
 
 - [Using the ESPHome Component](#using-the-esphome-component)
 - [Using the Arduino sketch](#using-the-arduino-sketch)
 - [BLE Documentation](#ble-documentation)
+- [Powerpal API Key and Device ID](#powerpal-api-key-and-device-id)
 
 ## Using the ESPHome Component
 
 The ESPHome component hasn't been merged into esphome yet, but you can use it via `external_components`
+> :grey_exclamation: This component now supports experimental Powerpal cloud uploading!
+This functionality allows you to view your energy data visualisations within the Powerpal application without ever have to bother connecting your Powerpal device to your phone ever again!
+This feature works by retrieving the Powerpal authentication information (stored on the Powerpa device itself), and collects 15 measurements before uploading them to your Powerpal Cloud.
+This requires your energy cost per kWh in the configuration, and currently doesn't support peak/off-peak switching.
 
 #### Requirements:
 - An ESP32
@@ -20,6 +26,7 @@ The ESPHome component hasn't been merged into esphome yet, but you can use it vi
   - BLE MAC address (can be found on device sticker, by ESPHome BLEtracker, or by using an app like nRF Connect)
   - Connection pairing pin (6 digits you input when setting up your device, also can be found printed in Powerpal info pack, or inside the Powerpal application)
   - Your Smart meter pulse rate (eg. 1000 pulses = 1kW/h)
+- Optionally uncomment the `http_request_id` and add your `cost_per_kwh` to enable Powerpal cloud uploading.
 
 ```yaml
 external_components:
@@ -84,6 +91,15 @@ static uint8_t read_every = 1; // minutes (only tested between 1 - 15 minutes)
 #### Serial Monitor output:
 ![Serial Monitor Example Output](assets/arduino_serial_monitor_output.png)
 
+## Powerpal API Key and Device ID
+The Powerpal Cloud API Key is stored on the Powerpal device itself at `59DA0009-12F4-25A6-7D4F-55961DCE4205`.
+The Device ID is stored at `59DA0010-12F4-25A6-7D4F-55961DCE4205`.
+It can be retrieved and decoded using:
+- [Python Authentication Retrieval Script](auth_extraction)
+- Or both the [ESPHome Component](#using-the-esphome-component) and the [Arduino Sketch](#using-the-arduino-sketch) will print it out on an established BLE connection to the Powerpal
+
+Also see [how to decode both values](#retrieving-and-decoding-cloud-api-key-and-device-id)
+
 ## BLE Documentation
 
 #### Important BLE services
@@ -137,7 +153,7 @@ uint32_t powerpal_pass_key = 123123;
 uint32_t powerpal_pass_key_hex = 0x01E0F3;
 // esp32 arduino BLE library needs to write data as an array of uint8_t's, so
 uint8_t powerpal_pass_key_array[] = {0x00, 0x01, 0xE0, 0xF3};
-// Powerpal wants this array in reversed byte order, so:
+// Powerpal wants this array in reversed byte order (little endian), so:
 uint8_t powerpal_pass_key_array_reversed[] = {0xF3, 0xE0, 0x01, 0x00};
 
 // now this can be written to the pairing code characteristic:
@@ -161,13 +177,52 @@ Parse incoming `measurement` notifications:
 ```c++
 // incoming data
 // pData = [112 7 98 98 4 0 208 101 196 189 209 1 7 63 123 158 108 62 160 115]
-// first 4 bytes (0-3) are a unix time stamp, again with reversed byte order
+// first 4 bytes (0-3) are a unix time stamp, again with reversed byte order (little endian)
 uint32_t unix_time = pData[0];
 unix_time += (pData[1] << 8);
 unix_time += (pData[2] << 16);
 unix_time += (pData[3] << 24);
 
-// next 2 bytes (4+5) are the pulses within the time interval window, with reversed byte order
+// next 2 bytes (4+5) are the pulses within the time interval window, with reversed byte order (little endian)
 uint16_t total_pulses = pData[4];
 total_pulses += pData[5] << 8;
+```
+#### Retrieving and Decoding Cloud API Key and Device ID
+
+Read and decode API Key:
+```c++
+// incoming data
+// data = [0x95, 0x21, 0x0D, 0x4E, 0x89, 0x4F, 0x42, 0xB7, 0xB8, 0x82, 0x4B, 0x94, 0xDF, 0x7D, 0xAA, 0x34]
+// 16 bytes in big endian order that simply need to be converted into a UUID string (lowercase and hyphens at index 8,12,16,20)
+const uint8_t length = 16;
+const char* hexmap[] = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f"};
+std::string api_key;
+for (int i = 0; i < length; i++) {
+  if ( i == 4 || i == 6 || i == 8 || i == 10 ) {
+    api_key.append("-");
+  }
+  api_key.append(hexmap[(data[i] & 0xF0) >> 4]);
+  api_key.append(hexmap[data[i] & 0x0F]);
+}
+//  api_key == "95210d4e-894f-42b7-b882-4b94df7daa34";
+```
+
+Read and decode Device ID:
+```c++
+// incoming data
+// data = [0xA7, 0x2B, 0x00, 0x00]
+// 4 bytes in reversed byte order (little endian) that needs to be converted to a lowercase string
+const uint8_t length = 4;
+const char* hexmap[] = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f"};
+std::string device_id;
+for (int i = length-1; i >= 0; i--) {
+  device_id.append(hexmap[(data[i] & 0xF0) >> 4]);
+  device_id.append(hexmap[data[i] & 0x0F]);
+}
+//  device_id == "00002ba7";
+```
+
+Test the decoded results on a computer with curl installed:
+```
+curl -H "Authorization: <YOUR_API_KEY>" https://readings.powerpal.net/api/v1/device/<YOUR_DEVICE_ID>
 ```
