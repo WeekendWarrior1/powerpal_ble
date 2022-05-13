@@ -2,6 +2,7 @@ _This repository is not affiliated with Powerpal._
 
 # powerpal_ble
 Collection of code, tools and documentation for data retrieval over BLE from your Powerpal.
+
 [*Home Assistant Community Discussion*](https://community.home-assistant.io/t/powerpal-smart-energy-monitor/263713/126)
 
 ![Powerpal Device](assets/powerpal_device_cropped.png)
@@ -15,9 +16,12 @@ Collection of code, tools and documentation for data retrieval over BLE from you
 
 The ESPHome component hasn't been merged into esphome yet, but you can use it via `external_components`
 > :grey_exclamation: This component now supports experimental Powerpal cloud uploading!
-This functionality allows you to view your energy data visualisations within the Powerpal application without ever have to bother connecting your Powerpal device to your phone ever again!
-This feature works by retrieving the Powerpal authentication information (stored on the Powerpa device itself), and collects 15 measurements before uploading them to your Powerpal Cloud.
-This requires your energy cost per kWh in the configuration, and currently doesn't support peak/off-peak switching.
+>
+> This functionality allows you to view your energy data visualisations within the Powerpal application without ever have to bother connecting your Powerpal device to your phone ever again.
+>
+> This feature works by retrieving the Powerpal authentication information (stored on the Powerpa device itself), and collects 15 measurements before uploading them to your Powerpal Cloud.
+>
+> This requires your energy cost per kWh in the configuration, and currently doesn't support peak/off-peak switching.
 
 #### Requirements:
 - An ESP32
@@ -96,7 +100,7 @@ The Powerpal Cloud API Key is stored on the Powerpal device itself at `59DA0009-
 The Device ID is stored at `59DA0010-12F4-25A6-7D4F-55961DCE4205`.
 It can be retrieved and decoded using:
 - [Python Authentication Retrieval Script](auth_extraction)
-- Or both the [ESPHome Component](#using-the-esphome-component) and the [Arduino Sketch](#using-the-arduino-sketch) will print it out on an established BLE connection to the Powerpal
+- Or both the [ESPHome Component](#using-the-esphome-component) and the [Arduino Sketch](#using-the-arduino-sketch) will print it out after establishing a BLE connection to the Powerpal
 
 Also see [how to decode both values](#retrieving-and-decoding-cloud-api-key-and-device-id)
 
@@ -166,7 +170,11 @@ Authentication is now complete, so time to configure the `readingBatchSize` (whi
 uint8_t newBatchReadingSize[] = {0x01, 0x00, 0x00, 0x00};
 pRemoteCharacteristic_readingbatchsize->writeValue(newBatchReadingSize, sizeof(newBatchReadingSize), false);
 ```
-> :warning: **If reducing the readingBatchSize**: If you have reduced the readingBatchSize, eg from 15m to 1m, at the time of the next update you will receive all the historic pulse updates that have been collected during the previous interval configuration. This may be an issue if you are writing this data to Home Assistant, which currently doesn't support recieving historic datapoints. Luckily all the updates include a timestamp, so you can likely filter to only accept updates that are within +-5 seconds of the current time.
+> :warning: **If reducing the readingBatchSize**:
+>
+> If you have reduced the readingBatchSize, eg from 15m to 1m, at the time of the next update you will receive all the historic pulse updates that have been collected during the previous interval configuration. 
+>This may be an issue if you are writing this data to Home Assistant, which currently doesn't support recieving historic datapoints. 
+Luckily all the updates include a timestamp, so you can likely filter to only accept updates that are within +-5 seconds of the current time.
 
 Subscribe to `measurement` notifications:
 ```c++
