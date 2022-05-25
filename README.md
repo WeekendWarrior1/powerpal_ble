@@ -38,9 +38,14 @@ external_components:
     # requires ble_client because I had to add some small features to authenticate properly
     components: [ ble_client, powerpal_ble ]
 
-# required even if you're not using the powerpal_cloud_uploader
-http_request:
+# optional requirement to enable powerpal cloud uploading
+#http_request:
 #  id: powerpal_cloud_uploader
+
+# optional requirement used with daily energy sensor
+time:
+  - platform: homeassistant
+    id: homeassistant_time
 
 esp32_ble_tracker:
 
@@ -53,6 +58,8 @@ sensor:
     ble_client_id: powerpal
     power:
       name: "Powerpal Power"
+    daily_energy:
+      name: "Powerpal Daily Energy"
     energy:
       name: "Powerpal Total Energy"
     battery_level:
@@ -60,6 +67,7 @@ sensor:
     pairing_code: 123123
     notification_interval: 1 # get updates every 1 minute
     pulses_per_kwh: 1000
+    time_id: homeassistant_time # daily energy still works without a time_id, but recommended to include one to properly handle daylight savings, etc.
 #    http_request_id: powerpal_cloud_uploader
 #    cost_per_kwh: 0.20 #dollars per kWh
 #    powerpal_device_id: 0000abcd #optional, component will retrieve from your Powerpal if not set
