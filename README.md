@@ -27,7 +27,7 @@ The ESPHome component hasn't been merged into esphome yet, but you can use it vi
 - An ESP32
 - A configured Powerpal
 - Powerpal device information:
-  - BLE MAC address (can be found on device sticker, by ESPHome BLEtracker, or by using an app like nRF Connect)
+  - BLE MAC address (can be found on device sticker, by ESPHome BLEtracker, or by using an app like nRF Connect once you have disabled the bluetooth of all your smart devices)
   - Connection pairing pin (6 digits you input when setting up your device, also can be found printed in Powerpal info pack, or inside the Powerpal application)
   - Your Smart meter pulse rate (eg. 1000 pulses = 1kW/h)
 - Optionally uncomment the `http_request_id` and add your `cost_per_kwh` to enable Powerpal cloud uploading.
@@ -86,7 +86,7 @@ It's mainly useful to demonstrate that the Powerpal is connectable over BLE by a
 - An ESP32
 - A configured Powerpal
 - Powerpal device information:
-  - BLE MAC address (can be found on device sticker, by running sketch, or by using an app like nRF Connect)
+  - BLE MAC address (can be found on device sticker, by running sketch, or by using an app like nRF Connect once you have disabled the bluetooth of all your smart devices)
   - Connection pairing pin (6 digits you input when setting up your device, also can be found printed in Powerpal info pack, or inside the Powerpal application)
   - Your Smart meter pulse rate (eg. 1000 pulses = 1kW/h)
 
